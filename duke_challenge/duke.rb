@@ -25,8 +25,18 @@ show_8 = {venue_name: "Mom and Pop Coffee Shop", ticket_price: 5, venue_capacity
 
 # Build classes for those two things. Think orange trees/oranges, or ovens/cookies, or hospital/employees here. Don't worry about behavior yet, just state, i.e. make sure any necessary instance variables are accounted for in your initialize methods before moving on. Your classes should expect hashes as arguments right from the start; bonus points if you can intuitively set some optional default values using Hash#fetch. 
 
+# (Skills: Modeling real-world objects as classes, naming variables descriptively and concisely, preventing argument order dependency)
+
+# Release 2 - Here's the fun part: let's dip our toes into behavior! Let's assume, for simplicity's sake, that it's a tour's job to add shows to its schedule. Write an instance method for a tour that takes your hash array from Release 0 as an argument and iterates over it, creating new show objects and adding them to a collection that belongs to that tour.
+
+# Then think about the kinds of messages a tour and a show might need to pass back and forth. Will you need to make use of any attr_reader/writer/accessors? Implement only the ones you need for the attributes you'll need access to. If you plan to implement a to_s method in the Show class, that should smell like a need for at least a couple readers. If a Tour object needs to modify one of its shows' ticket prices, what kind of access will you need to write into the Show class?
+
+# Run your code. Make sure things do what they're supposed to. If you haven't run your code before reading this, you're taking risks you can't afford. Always be testing.
+
+# (Skills: Object instantiation, dealing with "attr_things" appropriately, testing with RSpec and/or driver code, reading and debugging errors)
+
 class Show
-  attr_reader :venue_name, :ticket_price, :venue_capacity, :actual_attendance, :cds_sold, :cd_price, :revenue
+  attr_reader :venue_name, :ticket_price, :venue_capacity, :actual_attendance, :cds_sold, :cd_price, :revenue, :filled_seat_percentage
 
   def initialize(options)
     @venue_name = options[:venue_name]
@@ -35,7 +45,19 @@ class Show
     @actual_attendance = options[:actual_attendance]
     @cds_sold = options[:cds_sold]
     @cd_price = options[:cd_price]
-    @revenue = (ticket_price * actual_attendance) + (cds_sold * cd_price)  
+    @revenue = (ticket_price * actual_attendance) + (cds_sold * cd_price)
+    @filled_seat_percentage = ((actual_attendance.to_f / venue_capacity) * 100).round(2)
+  end
+
+  def lucky?
+    # Depends on how you want this calculated
+    # This takes everything in the venue_name string (spaces, punctuation) to calculate if it is lucky
+    # Or you could do a regex to remove everything but letter and then just cound the letters
+    venue_capacity % venue_name.length == 0
+  end
+
+  def to_s
+    "Show venue: #{venue_name}, Venue Capacity: #{venue_capacity}, Attendance: #{actual_attendance}, Ticket Price: $#{ticket_price}, CDs Sold: #{cds_sold}, CD Price: $#{cd_price}, Seats Filled: #{filled_seat_percentage}%, Revenue: $#{revenue}, Lucky: #{lucky?}."
   end
 end
 
@@ -64,7 +86,43 @@ class Tour
   def calculate_profit
     @total_profit = total_revenue - total_expenses
   end
+
+  def tour_venue_names
+    venue_names = []
+    shows_list.each{ |show| venue_names << show.venue_name }
+    venue_names
+  end
+
+  def average_ticket_cost
+    ticket_prices = []
+    shows_list.each{ |show| ticket_prices << show.ticket_price }
+    tour_size = ticket_prices.size
+    average_price = (ticket_prices.reduce(:+).to_f / tour_size).round(2)
+  end
+
+  def show_with_lowest_seats_filled
+    puts "TRUE BELIEVERS! DON'T ABANDON THIS CROWD"
+    puts shows_list.sort_by{ |show| show.filled_seat_percentage }[0]
+  end
+
+  def show_with_highest_revenue
+    puts "The Show with the highest revenue is:"
+    puts shows_list.sort_by{ |show| show.revenue }[-1]
+  end
+
+  def show_with_highest_cds_sold
+    puts "The Show with the highest revenue is:"
+    puts show_list.sort_by{ |show| show.cds_sold }[-1]
+  end
 end
+
+####################
+# DRIVER TEST CODE #
+####################
+show = Show.new(show_1)
+puts show.filled_seat_percentage
+puts show.lucky?
+puts show
 
 new_tour = Tour.new
 p new_tour # should return like a hash, Tour class with object ID then revnue,expenses,profit, and show list
@@ -72,15 +130,13 @@ new_tour.add_show(show_1)
 new_tour.calculate_total_revenue
 new_tour.calculate_profit
 p new_tour
-# (Skills: Modeling real-world objects as classes, naming variables descriptively and concisely, preventing argument order dependency)
-
-# Release 2 - Here's the fun part: let's dip our toes into behavior! Let's assume, for simplicity's sake, that it's a tour's job to add shows to its schedule. Write an instance method for a tour that takes your hash array from Release 0 as an argument and iterates over it, creating new show objects and adding them to a collection that belongs to that tour.
-
-# Then think about the kinds of messages a tour and a show might need to pass back and forth. Will you need to make use of any attr_reader/writer/accessors? Implement only the ones you need for the attributes you'll need access to. If you plan to implement a to_s method in the Show class, that should smell like a need for at least a couple readers. If a Tour object needs to modify one of its shows' ticket prices, what kind of access will you need to write into the Show class?
-
-# Run your code. Make sure things do what they're supposed to. If you haven't run your code before reading this, you're taking risks you can't afford. Always be testing.
-
-# (Skills: Object instantiation, dealing with "attr_things" appropriately, testing with RSpec and/or driver code, reading and debugging errors)
+puts new_tour.shows_list
+new_tour.add_show(show_2)
+new_tour.add_show(show_3)
+p new_tour.tour_venue_names
+p new_tour.average_ticket_cost
+new_tour.show_with_lowest_seats_filled
+new_tour.show_with_highest_revenue 
 
 # Release 3 -  More behavior! Marissa thinks you're doing great work, and she's ready to get her hands dirty with some number crunching. Pick three of these methods, write them, test them, and then move on if you'd like.
 
@@ -104,7 +160,23 @@ p new_tour
 
 # First, use Schema Designer or something like it (pen and paper is fine) to draw out the basic relationship between your classes in database table format. Make sure to add foreign keys where necessary.
 
+##################################################################################################
+# Can't draw the schema on the train with no internet but it would be a one to many relationship.
+# One tour has many shows.
+# Table for both show and tour. Shows would have a column for tour_id.
+
+# There could also be many bands at a single tour event (like warmup bands or people at music fests)
+# You could have a table for bands and link them with the shows. Many to Many relationship here.
+# One show can have many bands and bands can perform at many shows.
+
+# Also you could have many bands that Marissa works for, or her company works for.
+# You could have a table for agents and link them to the band. Probably a one to many.
+# An agent can have many bands but a band only has one agent.(I think)
+###################################################################################################
+
 # Now, piggyback off that and use CREATE TABLE a couple times to build your schema in an actual database. (Review this to get started, if you need to: https://github.com/chi-rock-doves-2015/database-drill-intro-to-sqlite-challenge) 
+
+
 
 # Now use INSERT INTO to fill your tables. Bonus points if you only need to use it once per table! There is a way, and it involves commas, and it's very Googleable.
 
