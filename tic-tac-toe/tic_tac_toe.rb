@@ -35,7 +35,7 @@ class TicTacToe
   end
   
   def display_board
-    puts "1|2|3\n-----\n4|5|6\n-----\n7|8|9"
+    puts "1|2|3\n-----\n4|5|6\n-----\n7|8|9\n\n"
   end
 
   def display_current_board
@@ -46,6 +46,8 @@ class TicTacToe
     until winner?
       @players.each do |player|
         empty_cell = false
+        display_board
+        display_current_board
 
         while empty_cell == false
           puts "#{player}'s please select a cell"
@@ -53,16 +55,17 @@ class TicTacToe
 
           if cell == "exit" || cell == "q" || cell == "quit"
             abort
-          elsif cell.to_i != 0  
+          elsif cell.to_i != 0
             if @game_board[cell.to_i] == " "
               game_board[cell.to_i] = "#{player}"
               empty_cell = true
-              display_current_board
             else
               puts "I am sorry but that cell already has an X or O. Please select again."
+              display_current_board
             end
           else
             puts "Sorry I don't reconize that command. Please try again."
+            display_current_board
           end
         end
       end
@@ -79,5 +82,4 @@ class TicTacToe
 end
 
 game = TicTacToe.new
-game.display_board
 game.game_controller
