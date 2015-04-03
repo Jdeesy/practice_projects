@@ -16,8 +16,11 @@
 
 
 class TicTacToe
+  attr_accessor :game_board
+  WINNING_COMBOS = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,9]]
 
   def initialize
+    @game_board = {1 => " ", 2 => " ", 3 => " ", 4 => " ", 5 => " ", 6 => " ", 7 => " ", 8 => " ", 9 => " "}
     @players = ["X","O"]
 
     puts "Welcome to Tic-Tac-Toe!"
@@ -31,12 +34,12 @@ class TicTacToe
     puts
   end
   
-  def create_board
-    @game_board = Array.new(3, Array.new(3)) 
+  def display_board
+    puts "1|2|3\n-----\n4|5|6\n-----\n7|8|9"
   end
 
-  def display_board
-    @game_board.each { |row| p row }
+  def display_current_board
+     puts "#{game_board[1]}|#{game_board[2]}|#{game_board[3]}\n-----\n#{game_board[4]}|#{game_board[5]}|#{game_board[6]}\n-----\n#{game_board[7]}|#{game_board[8]}|#{game_board[9]}"
   end
 
   def game_controller
@@ -44,17 +47,22 @@ class TicTacToe
       @players.each do |player|
         empty_cell = false
 
-        while empty_cell = false
-          puts "#{player}'s please select a row"
-          row = gets.chomp.to_i + 1
-          puts "Now select a column"
-          column = gets.chomp.to_i + 1
+        while empty_cell == false
+          puts "#{player}'s please select a cell"
+          cell = gets.chomp.downcase
 
-          if @game_board[row][column] = nil
-            @game_board[row][column] = player
-            empty_cell = true
+          if cell == "exit" || cell == "q" || cell == "quit"
+            abort
+          elsif cell.to_i != 0  
+            if @game_board[cell.to_i] == " "
+              game_board[cell.to_i] = "#{player}"
+              empty_cell = true
+              display_current_board
+            else
+              puts "I am sorry but that cell already has an X or O. Please select again."
+            end
           else
-            puts "I am sorry but that cell already has an X or O. Please select again."
+            puts "Sorry I don't reconize that command. Please try again."
           end
         end
       end
@@ -62,10 +70,14 @@ class TicTacToe
   end
 
   def winner?
+    false
+  end
 
+  def to_s
+    "#{game_board[1]}|#{game_board[2]}|#{game_board[3]}\n-----\n#{game_board[4]}|#{game_board[5]}|#{game_board[6]}\n-----\n#{game_board[7]}|#{game_board[8]}|#{game_board[9]}"
   end
 end
 
 game = TicTacToe.new
-game.create_board
-#game.display_board
+game.display_board
+game.game_controller
