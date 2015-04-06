@@ -16,12 +16,14 @@
 
 
 class TicTacToe
-  attr_accessor :game_board, :WINNING_COMBOS
+  attr_accessor :game_board, :WINNING_COMBOS, :winner
   WINNING_COMBOS = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
 
   def initialize
     @game_board = {1 => " ", 2 => " ", 3 => " ", 4 => " ", 5 => " ", 6 => " ", 7 => " ", 8 => " ", 9 => " "}
     @players = ["X","O"]
+    @winner = false
+
 
     puts "Welcome to Tic-Tac-Toe!"
     puts "To begin, someone needs to pick Heads or Tails"
@@ -44,10 +46,9 @@ class TicTacToe
 
   def game_controller
     display_board
-    @winner = false
     until @winner == true
       @players.each do |player|
-        winner?
+        game_over?
         empty_cell = false
         break if @winner == true
 
@@ -99,7 +100,7 @@ class TicTacToe
     end
   end
 
-  def winner?
+  def game_over?
     WINNING_COMBOS.each do |cells|
       winning_array = []
       cells.each { |cell| winning_array << game_board[cell] }
@@ -118,5 +119,5 @@ class TicTacToe
   # end
 end
 
-game = TicTacToe.new
-game.game_controller
+# game = TicTacToe.new
+# game.game_controller
