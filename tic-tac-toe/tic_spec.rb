@@ -3,16 +3,20 @@ require_relative 'tic_tac_toe'
 describe 'TicTacToe' do 
   let(:game){ TicTacToe.new }
 	
+  it 'should return the ' do
+
+  end
+
   describe 'create_board' do 
     it 'should create a new game board' do 
-      expect(game.create_board.class).to be(Array)
+      expect(game.game_board).to be_a Hash
     end
   end
 
-  describe 'display_board' do
+  pending 'display_board' do
+    # need to change puts to p on line 37
     it 'should diplay the game board' do
-      game.create_board 
-      expect(game.display_board).to eq([[nil, nil, nil],[nil, nil, nil],[nil, nil, nil]])
+      expect(game.display_board).to be_a String
     end
   end
 

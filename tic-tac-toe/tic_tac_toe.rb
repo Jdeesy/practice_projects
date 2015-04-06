@@ -16,7 +16,7 @@
 
 
 class TicTacToe
-  attr_accessor :game_board
+  attr_accessor :game_board, :WINNING_COMBOS
   WINNING_COMBOS = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
 
   def initialize
@@ -56,11 +56,12 @@ class TicTacToe
           puts "#{player}'s please select a cell"
           player_input = gets.chomp.downcase
 
-          if player_input == "exit" || player_input == "q" || player_input == "quit"
+          case player_input
+          when "exit", "quit", "q"
             puts "Are you sure you want to quit? (y/n)"
             answer = gets.chomp.downcase
             abort if answer == "y" || answer == "yes"
-          elsif player_input.to_i != 0
+          when /\A[1-9]\z/
             if @game_board[player_input.to_i] == " "
               game_board[player_input.to_i] = "#{player}"
               empty_cell = true
@@ -74,6 +75,25 @@ class TicTacToe
             display_board
             display_current_board
           end
+
+          # if player_input == "exit" || player_input == "q" || player_input == "quit"
+          #   puts "Are you sure you want to quit? (y/n)"
+          #   answer = gets.chomp.downcase
+          #   abort if answer == "y" || answer == "yes"
+          # elsif player_input.to_i != 0
+          #   if @game_board[player_input.to_i] == " "
+          #     game_board[player_input.to_i] = "#{player}"
+          #     empty_cell = true
+          #     display_current_board
+          #   else
+          #     puts "I am sorry but that cell already has an X or O. Please select again."
+          #     display_current_board
+          #   end
+          # else
+          #   puts "Sorry I don't recognize that command. Please try again."
+          #   display_board
+          #   display_current_board
+          # end
         end
       end
     end
